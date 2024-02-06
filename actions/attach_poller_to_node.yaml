@@ -1,0 +1,22 @@
+---
+description: "Attach (associate) an Orion Node poller to Node"
+enabled: true
+entry_point: 'attach_poller_to_node.py'
+name: "update_node_poller"
+pack: "orion"
+runner_type: "python-script"
+
+parameters:
+  node:
+    type: "string"
+    description: "The node to poll in Orion."
+    required: true
+  poller:
+    type: "string"
+    description: "The name of the poller to attach (associate) to the node."
+    required: true
+  enabled:
+    type: "boolean"
+    description: "Flag for whether or not poller is enabled."
+    required: true
+    default: true
