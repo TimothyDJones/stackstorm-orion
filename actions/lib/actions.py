@@ -17,6 +17,7 @@ import time
 
 from st2common.runners.base_action import Action
 from orionsdk import SwisClient
+from orionsdk import SolarWinds
 
 from lib.node import OrionNode
 from lib.utils import send_user_error, is_ip
@@ -39,7 +40,7 @@ class OrionBaseAction(Action):
         elif "orion_password" not in self.config:
             raise ValueError("Orion password details not in the config.yaml")
 
-    def connect(self):
+    def connect(self, include_solarwinds_client=False):
         """
         Connect to the Orion server listed in the config.
         """
@@ -47,6 +48,13 @@ class OrionBaseAction(Action):
         self.client = SwisClient(self.config['orion_host'],
                                  self.config['orion_user'],
                                  self.config['orion_password'])
+
+        if include_solarwinds_client:
+            self.sw_client = SolarWinds(npm_server=self.config['orion_host'],
+                                        username=self.config['orion_user'],
+                                        password=self.config['orion_password'])
+        else:
+            self.sw_client = None
 
         return self.config['orion_label']
 
@@ -292,3 +300,17 @@ class OrionBaseAction(Action):
         ts['UserName'] = transfer_data['results'][0]['UserName']
 
         return ts
+
+    def call_solarwinds_method(self, method=None, params={}):
+        if (not method
+            or not params):
+            send_user_error("Solarwinds method and/or parameters not specified.")
+            raise ValueError("Solarwinds method and/or parameters not specified.")
+        try:
+            func = getattr(self.sw_client.__module__, method)
+            return func(**params)
+        except Exception as e:
+            send_user_error("No Solarwinds method named '{m}' found.".format(
+                m=method))
+            raise ValueError("No Solarwinds method named '{m}' found.".format(
+                m=method))
