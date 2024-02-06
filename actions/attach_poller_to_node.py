@@ -43,14 +43,28 @@ class AttachPollerToNode(OrionBaseAction):
             send_user_error(error_msg)
             raise ValueError(error_msg)
 
-        orion_data = self.call_solarwinds_method(method="attach_poller_to_node",
-            params={
-                "node_name": node,
-                "poller_name": poller,
-                "enabled": enabled
-            })
+        _poller = {
+            'PollerType': poller,
+            'NetObject': 'N:{}'.format(orion_node.npm_id),
+            'NetObjectType': 'N',
+            'NetObjectID': orion_node.npm_id,
+            'Enabled': enabled
+        }
 
-        # This `attach_poller_to_node` always returns None, so check and return True
+        orion_data = self.create('Orion.Pollers', **_poller)
+        self.logger.info("Added {} ({}) poller: {}".format(
+            _poller['PollerType'],
+            _poller['Enabled'],
+            orion_data))
+
+        # orion_data = self.call_solarwinds_method(method="attach_poller_to_node",
+        #     params={
+        #         "node_name": node,
+        #         "poller_name": poller,
+        #         "enabled": enabled
+        #     })
+
+        # This method always returns None, so check and return True
         if orion_data is None:
             return True
         else:
