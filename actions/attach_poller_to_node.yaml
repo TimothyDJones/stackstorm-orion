@@ -2,7 +2,7 @@
 description: "Attach (associate) an Orion Node poller to Node"
 enabled: true
 entry_point: 'attach_poller_to_node.py'
-name: "update_node_poller"
+name: "attach_poller_to_node"
 pack: "orion"
 runner_type: "python-script"
 
