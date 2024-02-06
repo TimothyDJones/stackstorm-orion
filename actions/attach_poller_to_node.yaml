@@ -9,7 +9,7 @@ runner_type: "python-script"
 parameters:
   node:
     type: "string"
-    description: "The node to poll in Orion."
+    description: "The name of the node to poll in Orion."
     required: true
   poller:
     type: "string"
